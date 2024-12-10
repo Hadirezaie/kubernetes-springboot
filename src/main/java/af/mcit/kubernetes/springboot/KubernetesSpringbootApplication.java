@@ -11,10 +11,10 @@ public class KubernetesSpringbootApplication {
 
 	@GetMapping("/loop")
 	public String forLoop(){
-		for(int i=1; i<=100000; i++){
+		for(int i=1; i<=1000; i++){
 			System.out.println(i);
 		}
-		return "looped 100000 times";
+		return "looped 1000 times";
 	}
 
 	public static void main(String[] args) {
