@@ -20,7 +20,7 @@ jobs:
           cache: maven
 
       - name: Build project
-        run: mvn clean package
+        run: mvn clean install
 
       - name: List target directory
         run: ls -la target/  # Verify the JAR file exists
