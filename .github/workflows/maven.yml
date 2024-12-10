@@ -16,37 +16,14 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin'
+          distribution: 'adopt'
           cache: maven
 
       - name: Build project
         run: mvn clean install
 
-      - name: List target directory
-        run: ls -la target/  # Verify the JAR file exists
-
-      # Upload the JAR file for use in the docker job
-      - name: Upload JAR file as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: kubernetes-springboot-jar
-          path: target/kubernetes-springboot.jar
-
-  docker:
-    runs-on: ubuntu-latest
-    needs: build  # Ensure this job runs after the "build" job
-    environment: Docker-hub  # Reference the environment for Docker secrets
-    steps:
-      - uses: actions/checkout@v4  # Check out the repository again
-
-      # Download the JAR file artifact from the build job
-      - name: Download JAR file artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: kubernetes-springboot-jar
-
-      - name: Build & push Docker image
-        uses: mr-smithers-excellent/docker-build-push@v6
+      - uses: mr-smithers-excellent/docker-build-push@v6
+        name: Build & push Docker image
         with:
           image: hadirezaie/kubernetes-springboot
           tags: latest
