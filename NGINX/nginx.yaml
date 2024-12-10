@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: k8s
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: k8s
+data:
+  default.conf: |
+    server {
+        listen 80;
+
+        log_format upstreamlog '[$time_local] $remote_addr -> $upstream_addr: $request';
+        access_log /var/log/nginx/access.log upstreamlog;
+
+        upstream backend {
+            server k8s-app-service:8080;
+        }
+
+        location / {
+            proxy_pass http://backend;
+            proxy_connect_timeout 10s;
+            proxy_read_timeout 30s;
+            proxy_send_timeout 30s;
+        }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: k8s
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 32620  # Optional: explicitly set the NodePort
+  selector:
+    app: nginx
