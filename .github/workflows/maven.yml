@@ -1,4 +1,8 @@
-name: Java CI with Maven
+
+
+
+name: Java CI with Maven'
+
 on:
   push:
     branches: [ "main" ]
@@ -15,4 +19,6 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+    - name:
+      run: mvn clean install
     
